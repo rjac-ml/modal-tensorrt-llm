@@ -34,11 +34,12 @@ tensorrt_image = modal.Image.from_registry(
 
 tensorrt_image = tensorrt_image.apt_install(
     "openmpi-bin", "libopenmpi-dev", "git", "git-lfs", "wget"
-).pip_install(
-    "tensorrt_llm==0.10.0.dev2024042300",
-    pre=True,
-    extra_index_url="https://pypi.nvidia.com",
-)
+#).pip_install(
+#    "tensorrt-llm==0.11.0.dev2024051400",
+#    pre=True,
+#    extra_index_url="https://pypi.nvidia.com",
+).run_commands("pip3 install tensorrt_llm -U --pre --extra-index-url https://pypi.nvidia.com")
+
 
 def download_model():
     import os
@@ -59,6 +60,8 @@ tensorrt_image = (  # update the image by downloading the model we're using
         "hf-transfer==0.1.6",
         "huggingface_hub==0.22.2",
         "requests~=2.31.0",
+        "nvidia-tensorrt==99.0.0",
+        "nvidia-pyindex==1.0.9"
     )
     .env(  # hf-transfer: faster downloads, but fewer comforts
         {"HF_HUB_ENABLE_HF_TRANSFER": "1"}
