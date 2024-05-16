@@ -28,18 +28,22 @@ PLUGIN_ARGS = f"--gemm_plugin={DTYPE} --gpt_attention_plugin={DTYPE}"
 
 
 tensorrt_image = modal.Image.from_registry(
-    "nvidia/cuda:12.1.1-devel-ubuntu22.04", 
+    "nvidia/cuda:12.1.0-devel-ubuntu22.04", 
     add_python="3.10"
 )
 
 tensorrt_image = tensorrt_image.apt_install(
-    "openmpi-bin", "libopenmpi-dev", "git", "git-lfs", "wget"
-#).pip_install(
-#    "tensorrt-llm==0.11.0.dev2024051400",
-#    pre=True,
-#    extra_index_url="https://pypi.nvidia.com",
-).run_commands("pip3 install tensorrt_llm -U --pre --extra-index-url https://pypi.nvidia.com")
+    "openmpi-bin", "libopenmpi-dev", "git", "git-lfs", "wget", "python3-pip"
+).run_commands([
+        "pip3 install tensorrt_llm -U --pre --extra-index-url https://pypi.nvidia.com",
+])
 
+tensorrt_image = (
+    tensorrt_image.run_commands([
+        'python3 -c "import os; print(os.listdir())"',
+        'python3 -c "import tensorrt_llm; print(tensorrt_llm.__version__);"'
+    ])
+)
 
 def download_model():
     import os
